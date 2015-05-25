@@ -1,0 +1,36 @@
+name: PMCReviewerKit
+version: 0.0.1
+description: Give those reviewers from PMC exactly what they want...
+author: jflory7
+website: http://justinwflory.com
+main: com.justinwflory.pmcreviewerkit.PMCReviewerKit
+prefix: PMCRK
+
+commands:
+  pmc:
+    description: Give those reviewers from PMC exactly what they want...
+    aliases: pmcrk
+
+permissions:
+  pmc.*:
+    description: Gives access to all PMCReviewerKit commands
+    children:
+      pmc.instantop: true
+      pmc.creative: true
+      pmc.youtube: true
+      pmc.review: true
+  pmc.instantop:
+    description: Gives player "fake OP", makes them look bad, and then kills and mutes them
+  pmc.creative:
+    description: Sets a player's gamemode to adventure
+  pmc.youtube:
+    description: Gives access to all YouTube commands
+    children:
+      pmc.youtube.verify: true
+      pmc.youtube.challenge: true
+  pmc.youtube.verify:
+    description: Mutes player and instructs them to "verify" their YouTuber status by emailing a null email
+  pmc.youtube.challenge:
+    description: Teleports player to the End with low health and spawns 15 creepers on them; cooldown is implemented
+  pmc.review:
+    description: Ask player to confirm if they want to follow through with reviewing; if answers yes and "verifies", bans user for a month

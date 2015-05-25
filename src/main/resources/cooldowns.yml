@@ -1,0 +1,4 @@
+# This file is used by the plugin internally for logging cooldowns for users. It's best not to touch anything in here.
+
+youtube:
+    challenge: []

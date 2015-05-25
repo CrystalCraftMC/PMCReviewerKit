@@ -1,0 +1,10 @@
+# PMCReviewerKit Configuration File
+# Written by jflory7
+
+# Some commands have cooldowns for often they can be used (in hours), such as sending them to the End and spawning mobs on them.
+# You can configure how many hours it takes before a player can run the command again.
+command-cooldown: 24
+
+# Use either a real or fake email for players to email "verification" of their YouTuber status. The intention is that they will
+# never be able to reply, so using a fake email might be a good idea if you don't want to be spammed.
+youtube-verify-email: youtuberverification@mailinator.com
