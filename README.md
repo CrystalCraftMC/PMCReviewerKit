@@ -1,4 +1,4 @@
-# PMCReviewerKit
+# PMCReviewerKit [![Build Status](https://travis-ci.org/jflory7/PMCReviewerKit.svg?branch=master)](https://travis-ci.org/jflory7/PMCReviewerKit)
 
 ## Description
 Tired of random people joining your server asking for OP so they can "review" your server? Turn headaches into laughs with this simple plugin.
