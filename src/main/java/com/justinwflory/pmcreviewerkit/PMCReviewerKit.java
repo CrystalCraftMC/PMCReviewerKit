@@ -26,6 +26,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +69,7 @@ public final class PMCReviewerKit extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        Player p = (Player) sender;
+        final Player p = (Player) sender;
 
         if (cmd.getName().equalsIgnoreCase("pmc")) {
             if (!(sender instanceof Player)) {
@@ -84,107 +85,134 @@ public final class PMCReviewerKit extends JavaPlugin {
             else if (args.length >= 1) {
                 // Gives player "fake OP", makes them look bad, and then kills and mutes them
                 //TODO Make all of this NOT lag the server to hell
+
                 if (args[0].equalsIgnoreCase("instantop")) {
-                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "[Server: Opped " + p.getName() + "]");
-                    try { Thread.sleep(5000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    p.awardAchievement(Achievement.GET_DIAMONDS);
-                    try { Thread.sleep(5000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    p.awardAchievement(Achievement.DIAMONDS_TO_YOU);
-                    try { Thread.sleep(5000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    p.performCommand("op Paril");
-                    try { Thread.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    p.performCommand("op 123diamondboy123");
-                    try { Thread.sleep(5000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    p.setWalkSpeed((float) 1.0);
-                    p.setItemInHand(new ItemStack(Material.DIAMOND_BLOCK,1));
-                    try { Thread.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + p.getDisplayName() + " has tried OPing other players and spawning in diamond blocks! Performing safety protection...");
-                    try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
-                    if (p.getItemInHand().equals(new ItemStack(Material.DIAMOND_BLOCK))) p.setItemInHand(new ItemStack(Material.AIR));
-                    p.setHealth(0.0);
-                    mutePlayer(p);
-                    p.setWalkSpeed((float) 0.2);
-                    return true;
-                }
-
-                // Sets a player's gamemode to adventure
-                else if (args[0].equalsIgnoreCase("creative")) {
-                    p.setGameMode(GameMode.ADVENTURE);
-                    p.sendMessage("Your gamemode has been updated");
-                    return true;
-                }
-
-                else if (args[0].equalsIgnoreCase("youtube")) {
-                    if (args.length == 1) {
-                        p.sendMessage(ChatColor.RED + "[PMCReviewerKit] Invalid usage.\n" + ChatColor.ITALIC + "/pmc youtube < verify | challenge >");
-                        return false;
-                    }
-
-                    // Mutes player and instructs them to "verify" their YouTuber status by emailing a null email
-                    else if (args[1].equalsIgnoreCase("verify")) {
-                        mutePlayer(p);
-                        for (int i=0; i<21; i++) p.sendMessage("");
-                        p.sendMessage(ChatColor.GREEN + "Congratulations, you have been put on the verification waitlist! In order to receive your " +
-                                "perks and privileges as soon as possible, please email proof of your YouTuber status to " + ChatColor.GRAY + "" +
-                                ChatColor.BOLD + "" + ChatColor.ITALIC + this.getConfig().getString("youtube-verify-email") + ChatColor.RESET + "" +
-                                ChatColor.GREEN + ", and once you have done so, your application will be reviewed and your chat privileges restored!");
-                        return true;
-                    }
-
-                    // Teleports player to the End with low health and spawns 15 creepers on them; cooldown is implemented
-                    else if (args[1].equalsIgnoreCase("challenge")) {
-                        long last = cooldownsYAML.getLong("youtube.challenge" + sender.getName(), 0L);
-                        long now = System.currentTimeMillis();
-                        if ((now - last) > HOURS_IN_MILLIS) {
-                            p.teleport(new Location(getWorld("world_the_end"), 0, 75, 0));
-                            p.setNoDamageTicks(500);
-                            p.setHealth(0.5);
-                            for (int i = 0; i < 16; i++) p.getWorld().spawnEntity(p.getLocation(), EntityType.CREEPER);
-                            this.getConfig().set("youtube.challenge" + sender.getName(), now);
-                        } else {
-                            p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "You have used this command too recently. Please wait " +
-                                    (now - last) + " hours before running this command again.");
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "[Server: Opped " + p.getName() + "]"); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { p.awardAchievement(Achievement.GET_DIAMONDS); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { p.awardAchievement(Achievement.DIAMONDS_TO_YOU); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { p.performCommand("op Paril"); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { p.performCommand("op 123diamondboy123"); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { p.setWalkSpeed((float) 1.0); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {  p.setItemInHand(new ItemStack(Material.DIAMOND_BLOCK, 1)); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + p.getDisplayName() + " has tried OPing other players and spawning in diamond blocks! Performing safety protection..."); }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (p.getItemInHand().equals(new ItemStack(Material.DIAMOND_BLOCK))) p.setItemInHand(new ItemStack(Material.AIR));
+                            p.setHealth(0.0);
+                            mutePlayer(p);
+                            p.setWalkSpeed((float) 0.2);
                         }
-                        return true;
-                    }
-                }
-
-                else if (args[0].equalsIgnoreCase("review")) {
-                    // Ask player to confirm if they want to follow through with reviewing; if answers yes and "verifies", bans user for a month
-                    if (args.length == 1) {
-                        p.sendMessage(ChatColor.BLUE + "Welcome to our server. Only PMC Staff Members are permitted to perform privileged reviews on our server. " +
-                                "If you are a PMC Staff Member, we will need you to prove your identity for us! If you do this, you will get OP, creative, fly, and " +
-                                "WorldEdit privileges.\n" + ChatColor.RED + "" + ChatColor.BOLD + "Are you a PMC Staff Member? Type " + ChatColor.ITALIC + "/pmc review <yes|no>");
-                        return true;
-                    }
-
-                    if (args[1].equalsIgnoreCase("yes")) {
-                        p.sendMessage(ChatColor.GREEN + "Welcome, PMC Staff Member! Please identify yourself using your PMC Staff Identification Number provided to you by the PMC Admins.\n" +
-                                ChatColor.RED + "" + ChatColor.BOLD + "Identify yourself using " + ChatColor.ITALIC + "/pmc review verify <ID #>");
-                        return true;
-                    }
-
-                    if (args[1].equalsIgnoreCase("no")) {
-                        p.sendMessage(ChatColor.GRAY + "Sorry, you are not eligible to review our server.");
-                        return true;
-                    }
-
-                    if (args[1].equalsIgnoreCase("verify")) {
-                        if (args.length >= 3) {
-                            p.sendMessage("DEBUG: As far as I know, this isn't working yet. :(");
-                            //TODO Actually ban the player?
-                            Bukkit.getBanList(Type.NAME).addBan(p.getName(), ChatColor.DARK_RED + "Invalid PMC Staff Identification Number!\nImpersonator confirmed.", new Date(Calendar.YEAR, Calendar.MONTH+1, Calendar.DAY_OF_MONTH), "Paril");
-                            return true;
-                        }
-
-                        else if (args.length == 2){
-                            p.sendMessage(ChatColor.RED + "Please specify a PMC Staff Identification Number.");
-                            return true;
-                        }
-                    }
+                    }.runTaskLater(this, 20);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + p.getDisplayName() + " has tried OPing other players and spawning in diamond blocks! Performing safety protection..."); }
+                    }.runTaskLater(this, 20);
                 }
                 return true;
             }
+
+            // Sets a player's gamemode to adventure
+            else if (args[0].equalsIgnoreCase("creative")) {
+                p.setGameMode(GameMode.ADVENTURE);
+                p.sendMessage("Your gamemode has been updated");
+                return true;
+            }
+
+            else if (args[0].equalsIgnoreCase("youtube")) {
+                if (args.length == 1) {
+                    p.sendMessage(ChatColor.RED + "[PMCReviewerKit] Invalid usage.\n" + ChatColor.ITALIC + "/pmc youtube < verify | challenge >");
+                    return false;
+                }
+            }
+
+            // Mutes player and instructs them to "verify" their YouTuber status by emailing a null email
+            else if (args[1].equalsIgnoreCase("verify")) {
+                mutePlayer(p);
+                for (int i=0; i<21; i++) p.sendMessage("");
+                p.sendMessage(ChatColor.GREEN + "Congratulations, you have been put on the verification waitlist! In order to receive your " +
+                        "perks and privileges as soon as possible, please email proof of your YouTuber status to " + ChatColor.GRAY + "" +
+                        ChatColor.BOLD + "" + ChatColor.ITALIC + this.getConfig().getString("youtube-verify-email") + ChatColor.RESET + "" +
+                        ChatColor.GREEN + ", and once you have done so, your application will be reviewed and your chat privileges restored!");
+                return true;
+            }
+
+            // Teleports player to the End with low health and spawns 15 creepers on them; cooldown is implemented
+            else if (args[1].equalsIgnoreCase("challenge")) {
+                long last = cooldownsYAML.getLong("youtube.challenge" + sender.getName(), 0L);
+                long now = System.currentTimeMillis();
+                if ((now - last) > HOURS_IN_MILLIS) {
+                    p.teleport(new Location(getWorld("world_the_end"), 0, 75, 0));
+                    p.setNoDamageTicks(500);
+                    p.setHealth(0.5);
+                    for (int i = 0; i < 16; i++) p.getWorld().spawnEntity(p.getLocation(), EntityType.CREEPER);
+                    this.getConfig().set("youtube.challenge" + sender.getName(), now);
+                } else {
+                    p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "You have used this command too recently. Please wait " +
+                            (now - last) + " hours before running this command again.");
+                }
+                return true;
+            }
+
+            else if (args[0].equalsIgnoreCase("review")) {
+                // Ask player to confirm if they want to follow through with reviewing; if answers yes and "verifies", bans user for a month
+                if (args.length == 1) {
+                    p.sendMessage(ChatColor.BLUE + "Welcome to our server. Only PMC Staff Members are permitted to perform privileged reviews on our server. " +
+                            "If you are a PMC Staff Member, we will need you to prove your identity for us! If you do this, you will get OP, creative, fly, and " +
+                            "WorldEdit privileges.\n" + ChatColor.RED + "" + ChatColor.BOLD + "Are you a PMC Staff Member? Type " + ChatColor.ITALIC + "/pmc review <yes|no>");
+                    return true;
+                }
+
+                if (args[1].equalsIgnoreCase("yes")) {
+                    p.sendMessage(ChatColor.GREEN + "Welcome, PMC Staff Member! Please identify yourself using your PMC Staff Identification Number provided to you by the PMC Admins.\n" +
+                            ChatColor.RED + "" + ChatColor.BOLD + "Identify yourself using " + ChatColor.ITALIC + "/pmc review verify <ID #>");
+                    return true;
+                }
+
+                if (args[1].equalsIgnoreCase("no")) {
+                    p.sendMessage(ChatColor.GRAY + "Sorry, you are not eligible to review our server.");
+                    return true;
+                }
+
+                if (args[1].equalsIgnoreCase("verify")) {
+                    if (args.length >= 3) {
+                        p.sendMessage("DEBUG: As far as I know, this isn't working yet. :(");
+                        //TODO Actually ban the player?
+                        Bukkit.getBanList(Type.NAME).addBan(p.getName(), ChatColor.DARK_RED + "Invalid PMC Staff Identification Number!\nImpersonator confirmed.", new Date(Calendar.YEAR, Calendar.MONTH+1, Calendar.DAY_OF_MONTH), "Paril");
+                        return true;
+                    }
+
+                    else if (args.length == 2){
+                        p.sendMessage(ChatColor.RED + "Please specify a PMC Staff Identification Number.");
+                        return true;
+                    }
+                }
+            }
+            return true;
         }
         return false;
     }

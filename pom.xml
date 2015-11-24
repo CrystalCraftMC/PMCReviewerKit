@@ -22,23 +22,21 @@
 
     <groupId>com.justinwflory.pmcreviewerkit</groupId>
     <artifactId>PMCReviewerKit</artifactId>
-    <version>1.8.6-R0.1-SNAPSHOT</version>
+    <version>1.8.8-R0.1-SNAPSHOT</version>
 
     <profiles>
         <profile>
             <id>com.justinwflory.pmcreviewerkit</id>
             <build>
                 <finalName>PMCReviewerKit</finalName>
-                <directory>src/main/java/</directory>
+                <directory>src/main/java</directory>
                 <resources>
                     <resource>
                         <targetPath>.</targetPath>
                         <filtering>true</filtering>
-                        <directory>${basedir}/src/main/resources/</directory>
+                        <directory>${basedir}/src/main/resources</directory>
                         <includes>
-                            <include>plugin.yml</include>
-                            <include>config.yml</include>
-                            <include>cooldowns.yml</include>
+                            <include>*.yml</include>
                         </includes>
                     </resource>
                 </resources>
@@ -67,12 +65,12 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.8.6-R0.1-SNAPSHOT</version>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.8.6-R0.1-SNAPSHOT</version>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
