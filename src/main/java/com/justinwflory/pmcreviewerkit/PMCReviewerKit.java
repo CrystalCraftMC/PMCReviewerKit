@@ -1,30 +1,23 @@
 /*
- * Copyright 2015 Justin W. Flory
+ * Copyright (c) 2016 Justin W. Flory
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package com.justinwflory.pmcreviewerkit;
 
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.*;
 import org.bukkit.BanList.Type;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -37,11 +30,28 @@ import java.util.concurrent.TimeUnit;
 import static org.bukkit.Bukkit.getConsoleSender;
 import static org.bukkit.Bukkit.getWorld;
 
+/**
+ * PMCReviewerKit.java
+ *
+ * This class allows a server owner of a Spigot Minecraft server to "troll the trolls" by letting players who claim to
+ * be reviewing your server for Planet Minecraft to get a little surprise when they are suddenly granted the
+ * permissions that they so desperately desire!
+ *
+ * @author Justin W. Flory <jflory7>
+ * @version 2016.03.04.v1
+ */
 public final class PMCReviewerKit extends JavaPlugin {
+
+    // Constants
     private final long HOURS_IN_MILLIS = TimeUnit.HOURS.toMillis(this.getConfig().getInt("command-cooldown"));
+
+    // Variables
     File cooldowns = new File("cooldowns.yml");
     YamlConfiguration cooldownsYAML;
 
+    /**
+     * Defines plugin behavior on server start-up.
+     */
     @Override
     public void onEnable() {
         getLogger().info("Enabling PMCReviewerKit...");
@@ -57,6 +67,7 @@ public final class PMCReviewerKit extends JavaPlugin {
             }
         }
 
+        // Connect to the Metrics server and submit plugin metrics
         try {
             MetricsLite metrics = new MetricsLite(this);
             metrics.start();
@@ -67,71 +78,37 @@ public final class PMCReviewerKit extends JavaPlugin {
         getLogger().info("PMCReviewerKit enabled.");
     }
 
+    /**
+     * Command listener that defines behavior for when specific commands are called or executed.
+     *
+     * @param sender the sender of the command
+     * @param cmd the command used by the sender
+     * @param label the label
+     * @param args the additional arguments passed with the command
+     * @return true if command executed successfully
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        final Player p = (Player) sender;
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("This command can only be run by a player.");
+            return false;
+        }
+
+        Player p = (Player) sender;
 
         if (cmd.getName().equalsIgnoreCase("pmc")) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("This command can only be run by a player.");
-                return false;
-            }
 
             if (args.length == 0) {
-                sender.sendMessage(ChatColor.RED + "[PMCReviewerKit] Please specify an argument.\n" + ChatColor.ITALIC + "/pmc < instantop | creative | youtube | review >");
+                sender.sendMessage(ChatColor.RED + "[PMCReviewerKit] Please specify an argument.\n" + ChatColor.ITALIC
+                        + "/pmc < instantop | creative | youtube | review >");
                 return false;
             }
 
             else if (args.length >= 1) {
                 // Gives player "fake OP", makes them look bad, and then kills and mutes them
-                //TODO Make all of this NOT lag the server to hell
-
                 if (args[0].equalsIgnoreCase("instantop")) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { p.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "[Server: Opped " + p.getName() + "]"); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { p.awardAchievement(Achievement.GET_DIAMONDS); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { p.awardAchievement(Achievement.DIAMONDS_TO_YOU); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { p.performCommand("op Paril"); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { p.performCommand("op 123diamondboy123"); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { p.setWalkSpeed((float) 1.0); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {  p.setItemInHand(new ItemStack(Material.DIAMOND_BLOCK, 1)); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + p.getDisplayName() + " has tried OPing other players and spawning in diamond blocks! Performing safety protection..."); }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (p.getItemInHand().equals(new ItemStack(Material.DIAMOND_BLOCK))) p.setItemInHand(new ItemStack(Material.AIR));
-                            p.setHealth(0.0);
-                            mutePlayer(p);
-                            p.setWalkSpeed((float) 0.2);
-                        }
-                    }.runTaskLater(this, 20);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() { Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + p.getDisplayName() + " has tried OPing other players and spawning in diamond blocks! Performing safety protection..."); }
-                    }.runTaskLater(this, 20);
+                    BukkitRunnable opThread = new InstantOp(p);
+                    opThread.runTaskAsynchronously(this);
                 }
                 return true;
             }
